@@ -1,0 +1,303 @@
+-- Database: BaseHospitalCentralizada
+
+-- DROP DATABASE "BaseHospitalCentralizada";
+
+CREATE DATABASE "BaseHospitalCentralizada"
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'Spanish_Spain.1252'
+    LC_CTYPE = 'Spanish_Spain.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
+COMMENT ON DATABASE "BaseHospitalCentralizada"
+    IS 'ProyectoBases1';
+--hhrr
+create table persona(
+idPersona int,
+	nIdenitdad int,
+	pNombre varchar(45),
+	sNombre varchar(45),
+	pApellido varchar(45),
+	sApellido varchar(45),
+	direccion varchar(45),
+	correoElectronico varchar(45),
+	sexo char(1),
+	constraint pk_persona primary key(idPersona)
+)
+create table Area(
+idArea int,
+	descripcion varchar(45)
+	constraint pk_Area primary key(idArea)
+)
+create table ocupacion(
+	idOcupacion int,
+	descripcion varchaer(45)
+	constraint pk_idOcupacion primary key(idOcupacion)
+)
+create table turno(
+idTurno int,
+	descripcion varchar(45),
+	horaInicio date,
+	horaFin date,
+	constraint pk_turno primary key(idTurno)
+)
+create table especialidad(
+idEspecialidad int,
+	descripcion varchaer(45),
+	constraint pk_especialidad primary key(idEspecialidad)
+)
+-- tablas independientes Atencion medica sin fk
+create table tipoSangre(
+idTipoSangre int,
+	grupo varchar(45),
+	rh varchar (45),
+	constraint pk_tipoSangre primary key (idTipoSangre)
+)
+create table tipoEnfermedad(
+idTipoEnfermedad int,
+	descripcion varchar(45)
+	constraint pk_tipoEnfermedad primary key(idTipoEnfermedad)
+)
+create table tipoTratamiento(
+idTipoTratamiento int,
+	descripcion varchar(45),
+	constraint pk_tipoTratamiento primary key(idTipoTratamiento)
+)
+create table tipoExamen(
+idTipoExamen int,
+	descripcion varchar(45),
+	constraint pk_tipoExamen primary key(idTipoExamen)
+)
+create table tipoCirujia(
+idTipoCirujia int,
+	descripcion varchar(45),
+	constraint pk_tipoCirujia primary key(idTipoCirujia)
+)
+--tablas sin fk area Hospital Estructura
+create table tipoCentro(
+idTipoCentro int,
+	descripcion varchar(45),
+	constraint pk_tipoCentro primary key (idTipoCentro)
+)
+--tablas dependientes RRHH
+create table personal(
+idPersonal int,
+	fechaRegistro date,
+	constraint pk_personal primary key(idPersonal)
+)
+alter table personal add constraint fk_persona_idPersona foreign key(persona_idPersona) references persona(idPersona)
+alter table personal add persona_idPersona int
+create table cargo(
+idCargo int,
+area_idArea int
+constraint pf_cargo primary key(idCargo)
+)
+alter table ccargo add constraint fk_area_idArea foreign key(area_idArea) references area(idArea)
+create table personal_cargo(
+personal_idPersonal int,
+cargo_idCargo int,
+fechaInicio date,
+fechaFin date
+)
+alter table personal_cargo add constraint fk_personal foreign key(personal_idPersonal) references personal(idPersonal)
+alter table personal_cargo add constraint fk_cargo foreign key(cargo_idCargo) references cargo(idCargo)
+create table expedienteClinico(
+idExpedienteClinico int,
+fechaCreacion date,
+centroMedico_idCentroMedico int
+constraint pk_expedienteClinico primary key(idExpedienteClinico)
+)
+alter table expedienteClinico add constraint fk_CentroMedico foreign key(centroMedico_idCentroMedico) references centroMedico(idCentroMedico)
+create table telefonos(
+idTelefonos int,
+descripcion varchar(45),
+persona_idPersona int,
+constraint pk_telefonos primary key(idTelefonos)
+)
+alter table telefonos add constraint fk_persona foreign key(idTelefonos) references persona(idPersona)
+create table contactoEmergencia (
+idContactoEmergencia int,
+expedienteClinico_indexExpedienteClinico int,
+persona_idPersona int,
+tipoSangre_idTipoSangre int,
+ocupacion_idOcupacion int,
+constraint pk_contactoEmergencias primary key(contactoEmergencia)
+)
+create table paciente(
+idPaciente int,
+expedienteClinico_indexExpedienteClinico int,
+persona_idPersona int,
+tipoSangre_idTipoSangre int,
+ocupacion_idOcupacion int
+constraint pk_pacinte primary key(idPaciente)
+)
+alter table paciente add constraint fk_expedienteClinico_indexExpedienteClinico foreign key(expedienteClinico_indexExpedienteClinico) references expedienteClinico(idExpedienteClinico)
+alter table paciente add constraint fk_persona foreign key(persona_idPersona) references persona(idPersona)
+alter table paciente add constraint fk_tipoSangre foreign key(tipoSangre_idTipoSangre) references tipoSanfre(idTipoSangre)
+alter table paciente add constraint fk_ocupacion foreign key(ocupacion_idOcupacion) references ocupacion(idOcupacion)
+create table medico(
+idMedico int,
+nColegicion int,
+persona_idPersona int,
+especialidad_idEspecialidad int,
+cosnsultas_idconsultas int,
+turno_idTurno int
+constraint pk_medico primary key(idMedico)
+)
+alter table medico add constraint fk_persona_medico foreign key(persona_idPersona) references persona(idPersona)
+alter table medico add constraint fk_especialidad foreign key(especialidad_idEspecialidad) references especialidad(idEspecialidad)
+alter table medico add constraint fk_consultas foreign key(cosnsultas_idconsultas) references consultas(idConsultas)
+alter table medico add constraint fk_turno foreign key(idTurno) references turni(idTurno)
+create table natalidad(
+idNatalidad int,
+fechaNatalidad date,
+idMadre int,
+idPadre int,
+constraint pk_natalidad primary key(idNatalidad)
+)
+alter table natalidad add constraint fk_persona_Madre foreign key(idMadre) references persona(idPersona)
+alter table natalidad add constraint fk_persona_Padre foreign key(idPadre) references persona(idPersona)
+--tablas Consultas Medicas dependien
+create table enfermedad(
+idEnfermedad int,
+enfermedad varchar(45),
+tipoEnfermedad_idTipoEnfermedad int
+constraint pf_enfermedad primary key(idEnfermedad)
+)
+alter table enfermedad add constraint fk_tipoEnfermedad foreign key(tipoEnfermedad_idTipoEnfermedad) references tipoEnfermedad(idTipoEnfermedad)
+create table tratamiento(
+idTratamiento int,
+fechaInicio date
+fechaFin int,
+descripcion varchar(45),
+tipoTratamiento_idTipoTratamiento int,
+constraint pk_tratamiento primary key(idTratamiento)
+)
+alter table tratamiento add constraint fk_tipoTratamiento foreign key(tipoTratamiento_idTipoTratamiento) references tipoTratamiento(idTipoTratamiento)
+create table cirujia (
+idCirujia int,
+fechaIngreso date,
+fechaSalida date,
+tipoCirujia_idTipoCirujia int,
+Hospitalizacion_idHospitalizacion int
+constraint pk_cirujia primary key(idCirujia)
+)
+alter table cirujia add constraint fk_tipoCirujia foreign key(tipoCirujia_idTipoCirujia) references tipoCirujia(idTipoCirujia)
+alter table cirujia add constraint fk_hospitalizacion foreign key(Hospitalizacion_idHospitalizacion) references hospitalizacion(idHospitalizacion)
+create table consulta_Tratamiento(
+cosnsultas_idconsultas int,
+tratamineto_idTratamiento int
+)
+alter table consulta_Tratamiento add constraint fk_consulta foreign key(cosnsultas_idconsultas) references Consultas(idConsultas)
+alter table consulta_Tratamiento add constraint fk_tatamiento foreign key (tratamineto_idTratamiento) references tratamiento(idTratamiento)
+create table consultas(
+idConsultas int,
+fecha date,
+evolucion varchar(45),
+descripcion varchar(45)
+expedienteClinico_indexExpedienteClinico int,
+enfermedad_idEnfermedad int
+constraint pk_consultas primary key(idConsultas)
+)
+alter table consultas add constraint fk_expedientrClinico foreign key(expedienteClinico_indexExpedienteClinico) references expedienteClinico(idExpedienteClinico)
+alter table consultas add constraint fk_emfermedad foreign key(enfermedad_idEnfermedad) references enferedad(idEnfermedad)
+create table examenes (
+idExamenes int,
+descripcion int,
+fechaExamenes date,
+resultadosExamenes varchar(45)
+tipoExamen_idTipoExamen int,
+paciente_idPaciente int,
+expedienteClinico_indexExpedienteClinico int
+constraint pk_examenes primary key(idExamenes)
+)
+alter table examenes add constraint fk_tipoExamen foreign key(tipoExamen_idTipoExamen) references tipoExamen(idTipoExamen)
+alter table examenes add constraint fk_paciente foreign key(paciente_idPaciente) references paciente(idPaciente)
+alter table examenes add constraint gk_expedienteClinico foreign key(expedienteClinico_indexExpedienteClinico) references expedienteClinico(idExpedienteClinico)
+create table defuncion(
+idDefuncion int,
+causa varchar(45),
+fecha date
+expedienteClinico_indexExpedienteClinico int
+)
+alter table defuncion add constraint fk_expedientrClinico foreign key(expedienteClinico_indexExpedienteClinico) references expedienteClinico(idExpedienteClinico)
+create table hospitalizacion(
+idHospitalizacion int,
+descripcion varchar(45),
+fechaIngreso date,
+fehcaAlta date,
+cama varchar(45)
+expedienteClinico_indexExpedienteClinico int,
+controlMedico_idControlMedico int,
+piso_idPiso int
+constraint pk_hospitalizacion primary key(idHospitalizacion)
+)
+alter table hospitalizacion add constraint fk_expedientrClinico foreign key(expedienteClinico_indexExpedienteClinico) references expedienteClinico(idExpedienteClinico)
+alter table hospitalizacion add constraint fk_controlMedico foreign key(controlMedico_idControlMedico) references controlMedico(idConrolMedico)
+alter table hospitalizacion add constraint fk_pisp foreign key(piso_idPiso) references piso(idPiso)
+create table centroMedico(
+idCentroMedico int,
+nombre varchar(45),
+direccion varchar(45),
+tipoCentro_idTipoCentro int,
+constraint pk_centroMedico primary key(idCentroMedico)
+)
+alter table centroMedico add constraint fk_tipoCentro foreign key(tipoCentro_idTipoCentro) references tipoCentro(idTipoCentro)
+create table consultorio(
+idConsultorio int,
+centroMedico_idCentroMedico int,
+piso_idPiso int,
+constraint pk_centroMedico primary key(centroMedico_idCentroMedico)
+)
+alter table consultorio add constraint fk_piso foreign key(piso_idPiso) references piso(idPiso)
+create table piso(
+idPiso int,
+numeroPiso int,
+edificio_idEdificio int
+constraint pk_piso primary key(idPiso)
+)
+alter table piso add constraint fk_edifico foreign key(edificio_idEdificio) references edifico(idEdificio)
+create table edifico(
+idEdificio int,
+nombre varchar(45),
+centroMedico_idCentroMedico int
+constraint pk_edificio primary key(idEdificio)
+)
+alter table edificio add constraint fk_CentroMedico foreign key(centroMedico_idCentroMedico) references centroMedico(idCentroMedico)
+create table medico_consultorio(
+medico_idMedico int,
+consutorio_idConsultorio int
+)
+alter table medico_consultorio add constraint fk_medico foreign key(medico_idMedico) refererences medico(idMedico)
+alter table medico_consultorio add constraint fk_consultorio foreign key(consutorio_idConsultorio) references consultorio(idConsultorio)
+create table paramedico(
+idParamedico int,
+licencia varchar(45),
+persona_idPersona int
+constraint pk_paramedico primary key(idParamedico)
+)
+alter table paramedico add constraint fk_persona foreign key(persona_idPersona) references persona(idPersona)
+create table ambulancia(
+idAmbulancia int,
+placa varchar(45),
+centroMedico_idCentroMedico int
+constraint pk_ambulacia primary key(idAmbulancia)
+)
+alter table ambulancia add constraint fk_CentroMedico foreign key(centroMedico_idCentroMedico) references centroMedico(idCentroMedico)
+create table atencionPreHospitalaria(
+idAtencionPreHospitalaria int,
+observacion varchar(45),
+fechaHora date,
+expedienteClinico_indexExpedienteClinico int,
+paramedico_idparamedico int,
+ambulancia_idAmbulancia int
+constraint pk_atenciaonPreHospitalaria primary key(idAtencionPreHospitalaria)
+)
+alter table atencionPreHospitalaria add constraint fk_expedienteClinico_indexExpedienteClinico foreign key(expedienteClinico_indexExpedienteClinico) references expedienteClinico(idExpedienteClinico)
+alter table atencionPreHospitalaria add constraint fk_paramedico foreign key(paramedico_idparamedico) references paramedico(idParamedico)
+alter table atencionPreHospitalaria add constraint fk_ambulancia foreign key(ambulancia_idAmbulancia) references ambulancia(idAmbulancia)
+
+
+
